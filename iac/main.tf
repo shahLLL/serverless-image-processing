@@ -33,3 +33,15 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
   role       = aws_iam_role.lambda_exec_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
+
+# 3. Create the Lambda Function
+resource "aws_lambda_function" "image_processor_lambda" {
+  filename         = "lambda_function.zip" 
+  function_name    = "processImageUpload"
+  role             = aws_iam_role.lambda_exec_role.arn
+  handler          = "lambda_function.lambda_handler"
+
+  source_code_hash = filebase64sha256("lambda_function.zip")
+  runtime          = "python3.9"
+  timeout          = 10
+}
