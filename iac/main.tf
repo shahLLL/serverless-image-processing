@@ -14,6 +14,19 @@ resource "aws_s3_bucket" "source_bucket" {
   }
 }
 
+# Create Destination S3 Bucket
+resource "aws_s3_bucket" "destination_bucket" {
+  bucket = "image-processed-destination-bucket-${data.aws_caller_identity.current.account_id}"
+}
+
+resource "aws_s3_bucket_public_access_block" "destination_buckets_access_block" {
+  bucket = aws_s3_bucket.destination_bucket.id
+  block_public_acls = true
+  block_public_policy = true
+  ignore_public_acls = true
+  restrict_public_buckets = true
+}
+
 # Create Lambda Execution Role
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda_s3_trigger_role"
@@ -55,6 +68,33 @@ resource "aws_lambda_function" "image_processor_lambda" {
   depends_on = [aws_iam_role_policy.lambda_access_policy]
 }
 
+# Create DynamoDB Table
+resource "aws_dynamodb_table" "image_metadata_table" {
+  name           = "ImageMetadataTable"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "ImageKey"
+
+  attribute {
+    name = "ImageKey"
+    type = "S"
+  }
+
+  tags = {
+    Project = "LambdaTrigger"
+  }
+}
+
+# Create SNS Topic
+resource "aws_sns_topic" "image_upload_topic" {
+  name = "ImageUploadNotificationTopic"
+}
+# Subscribe email to SNS Topic
+resource "aws_sns_topic_subscription" "email_subscription" {
+  topic_arn = aws_sns_topic.image_upload_topic.arn
+  protocol  = "email"
+  endpoint  = "shahLLL@yahoo.com"
+}
+
 # Grant S3 permission to invoke the Lambda function
 resource "aws_lambda_permission" "allow_s3_to_invoke_lambda" {
   statement_id  = "AllowS3InvokeLambda"
@@ -74,22 +114,6 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
     filter_suffix       = ".jpg"
   }
   depends_on = [aws_lambda_permission.allow_s3_to_invoke_lambda]
-}
-
-# Create DynamoDB Table
-resource "aws_dynamodb_table" "image_metadata_table" {
-  name           = "ImageMetadataTable"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "ImageKey"
-
-  attribute {
-    name = "ImageKey"
-    type = "S"
-  }
-
-  tags = {
-    Project = "LambdaTrigger"
-  }
 }
 
 # Give Permissions to Lambda
@@ -126,30 +150,6 @@ resource "aws_iam_role_policy" "lambda_access_policy" {
       }
     ]
   })
-}
-
-# Create SNS Topic
-resource "aws_sns_topic" "image_upload_topic" {
-  name = "ImageUploadNotificationTopic"
-}
-# Subscribe email to SNS Topic
-resource "aws_sns_topic_subscription" "email_subscription" {
-  topic_arn = aws_sns_topic.image_upload_topic.arn
-  protocol  = "email"
-  endpoint  = "shahLLL@yahoo.com"
-}
-
-# Create Destination S3 Bucket
-resource "aws_s3_bucket" "destination_bucket" {
-  bucket = "image-processed-destination-bucket-${data.aws_caller_identity.current.account_id}"
-}
-
-resource "aws_s3_bucket_public_access_block" "destination_buckets_access_block" {
-  bucket = aws_s3_bucket.destination_bucket.id
-  block_public_acls = true
-  block_public_policy = true
-  ignore_public_acls = true
-  restrict_public_buckets = true
 }
 
 # Output the names of key resources
