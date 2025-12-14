@@ -45,3 +45,25 @@ resource "aws_lambda_function" "image_processor_lambda" {
   runtime          = "python3.9"
   timeout          = 10
 }
+
+# Grant S3 permission to invoke the Lambda function
+resource "aws_lambda_permission" "allow_s3_to_invoke_lambda" {
+  statement_id  = "AllowS3InvokeLambda"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.image_processor_lambda.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.source_bucket.arn
+}
+
+# Configure the S3 Bucket to trigger the Lambda function
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket = aws_s3_bucket.source_bucket.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.image_processor_lambda.arn
+    # Trigger only when objects with image extensions are created
+    events              = ["s3:ObjectCreated:*"] 
+    filter_suffix       = ".jpg"
+  }
+  depends_on = [aws_lambda_permission.allow_s3_to_invoke_lambda]
+}
