@@ -34,7 +34,7 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# 3. Create the Lambda Function
+# Create the Lambda Function
 resource "aws_lambda_function" "image_processor_lambda" {
   filename         = "lambda_function.zip" 
   function_name    = "processImageUpload"
@@ -47,9 +47,10 @@ resource "aws_lambda_function" "image_processor_lambda" {
   environment {
     variables = {
       DYNAMODB_TABLE_NAME = aws_dynamodb_table.image_metadata_table.name
+      SNS_TOPIC_ARN       = aws_sns_topic.image_upload_sns_topic.arn
     }
   }
-  depends_on = [aws_iam_role_policy.lambda_dynamodb_policy]
+  depends_on = [aws_iam_role_policy.lambda_dynamodb_sns_policy]
 }
 
 # Grant S3 permission to invoke the Lambda function
@@ -67,7 +68,6 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.image_processor_lambda.arn
-    # Trigger only when objects with image extensions are created
     events              = ["s3:ObjectCreated:*"] 
     filter_suffix       = ".jpg"
   }
@@ -91,8 +91,8 @@ resource "aws_dynamodb_table" "image_metadata_table" {
 }
 
 # Give Permission to Lambda to write to DynamoDB Table
-resource "aws_iam_role_policy" "lambda_dynamodb_policy" {
-  name = "lambda_dynamodb_write_access"
+resource "aws_iam_role_policy" "lambda_dynamodb_sns_policy" {
+  name = "lambda_dynamodb_sns_access"
   role = aws_iam_role.lambda_exec_role.id
 
   policy = jsonencode({
@@ -101,11 +101,25 @@ resource "aws_iam_role_policy" "lambda_dynamodb_policy" {
       Effect   = "Allow",
       Action   = [
         "dynamodb:PutItem",
-        "dynamodb:BatchWriteItem"
+        "dynamodb:BatchWriteItem",
+        "sns:Publish"
       ],
-      Resource = aws_dynamodb_table.image_metadata_table.arn
+      Resource = [
+        aws_dynamodb_table.image_metadata_table.arn,
+        aws_sns_topic.image_upload_sns_topic.arn
+      ]
     }]
   })
 }
 
+# Create SNS Topic
+resource "aws_sns_topic" "image_upload_sns_topic" {
+  name = "ImageUploadNotificationTopic"
+}
+# Subscribe email to SNS Topic
+resource "aws_sns_topic_subscription" "email_subscription" {
+  topic_arn = aws_sns_topic.image_upload_sns_topic.arn
+  protocol  = "email"
+  endpoint  = "shahLLL@yahoo.com"
+}
 
