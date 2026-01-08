@@ -8,7 +8,6 @@ variable "aws_region" {
 variable "email_endpoint" {
   description = "Email address for SNS notifications"
   type        = string
-  default     = "shahLLL@yahoo.com"
 }
 
 variable "project_name" {
