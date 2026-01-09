@@ -82,6 +82,7 @@ Removes deployed infrastructure
 
 # Forking & Contribution 🍴
 This project is a great base for further development. Some ideas for extending/building upon this project:
+
 🌐 Web & mobile apps
   - Profile photo resizing
 
