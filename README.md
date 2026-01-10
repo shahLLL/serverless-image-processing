@@ -19,9 +19,7 @@ Serverless is a cloud execution model where you write and deploy code without ma
   
  - Patch management
 
-It is an exciting new cloud computing paradigm where you pay only for actual execution time, not idle servers.
-
-In this example we are using [AWS Serverless](https://aws.amazon.com/serverless/) technology to create an image processing system.
+[AWS Serverless Technology](https://aws.amazon.com/serverless/) is used in this project. For a deeper dive please feel free to read [this](https://medium.com/@samiur1998/designing-a-serverless-image-processing-system-on-aws-a88d74d04bb7) article.
 
 ## Components
 The following are the components used in this project:
