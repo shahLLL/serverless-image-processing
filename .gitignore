@@ -40,3 +40,9 @@ terraform.rc
 iac/lambda_function.zip
 # .DS_Store
 .DS_Store
+# Python
+src/.venv/
+src/__pycache__/
+src/.pytest_cache/
+src/.ruff_cache/
+src/*.pyc

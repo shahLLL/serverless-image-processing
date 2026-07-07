@@ -12,11 +12,13 @@ logger = logging.getLogger()
 logger.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
 # ------------------- Configuration -------------------
+
+
 class Config:
     def __init__(self):
-        self.dynamodb_table = os.environ["DYNAMODB_TABLE_NAME"]
-        self.sns_topic_arn = os.environ["SNS_TOPIC_ARN"]
-        self.destination_bucket = os.environ["DESTINATION_BUCKET"]
+        self.dynamodb_table = os.environ.get("DYNAMODB_TABLE_NAME")
+        self.sns_topic_arn = os.environ.get("SNS_TOPIC_ARN")
+        self.destination_bucket = os.environ.get("DESTINATION_BUCKET")
         self.processed_prefix = os.environ.get("PROCESSED_PREFIX", "processed/")
 
         missing = [
@@ -32,11 +34,34 @@ class Config:
 
 
 # ------------------- Global Clients -------------------
-s3_client = boto3.client("s3")
-dynamodb_resource = boto3.resource("dynamodb")
-sns_client = boto3.client("sns")
+s3_client = None
+dynamodb_resource = None
+sns_client = None
+
+
+def get_s3_client():
+    global s3_client
+    if s3_client is None:
+        s3_client = boto3.client("s3")
+    return s3_client
+
+
+def get_dynamodb_resource():
+    global dynamodb_resource
+    if dynamodb_resource is None:
+        dynamodb_resource = boto3.resource("dynamodb")
+    return dynamodb_resource
+
+
+def get_sns_client():
+    global sns_client
+    if sns_client is None:
+        sns_client = boto3.client("sns")
+    return sns_client
 
 # ------------------- Helper Functions -------------------
+
+
 def copy_image_to_destination(
     source_bucket: str, object_key: str, config: Config
 ) -> None:
@@ -44,7 +69,7 @@ def copy_image_to_destination(
     dest_key = f"{config.processed_prefix}{object_key}"
 
     try:
-        s3_client.copy_object(
+        get_s3_client().copy_object(
             Bucket=config.destination_bucket,
             CopySource={"Bucket": source_bucket, "Key": object_key},
             Key=dest_key,
@@ -70,7 +95,7 @@ def store_metadata(
 ) -> None:
     """Store metadata in DynamoDB - best effort"""
     try:
-        table = dynamodb_resource.Table(config.dynamodb_table)
+        table = get_dynamodb_resource().Table(config.dynamodb_table)
         table.put_item(
             Item={
                 "ImageKey": object_key,
@@ -101,7 +126,7 @@ def send_notification(
             f"Destination: {config.destination_bucket}/{config.processed_prefix}{object_key}"
         )
 
-        sns_client.publish(
+        get_sns_client().publish(
             TopicArn=config.sns_topic_arn,
             Message=message,
             Subject="New Image Processed",
@@ -129,7 +154,7 @@ def process_single_record(record: Dict[str, Any], config: Config) -> bool:
         store_metadata(key, bucket, config, event_time)
         send_notification(key, bucket, config)
         return True
-    except Exception as e:
+    except Exception:
         logger.error(
             "Critical failure during record processing",
             exc_info=True,
@@ -138,6 +163,8 @@ def process_single_record(record: Dict[str, Any], config: Config) -> bool:
         return False
 
 # ------------------- Main Handler -------------------
+
+
 def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     """Main Lambda entry point"""
     try:
