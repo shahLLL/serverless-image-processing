@@ -1,4 +1,4 @@
-# Serverless-Image-Processing
+# Serverless-Image-Processing 📷
 This repository contains terraform infrastructure code that implements a serverless image processing system. 
 
 This codebase contains both the source and infrastructure code that are necessary for the system.
@@ -21,7 +21,7 @@ Serverless is a cloud execution model where you write and deploy code without ma
 
 [AWS Serverless Technology](https://aws.amazon.com/serverless/) is used in this project. For a deeper dive please feel free to read [this](https://medium.com/@samiur1998/designing-a-serverless-image-processing-system-on-aws-a88d74d04bb7) article.
 
-## Components
+## Components 🍰
 The following are the components used in this project:
  - [Amazon S3](https://aws.amazon.com/s3/?trk=3d8e0834-4a13-43d9-9142-a95c86f6929f&sc_channel=ps&trk=3d8e0834-4a13-43d9-9142-a95c86f6929f&sc_channel=ps&ef_id=Cj0KCQiAyP3KBhD9ARIsAAJLnnaNTmdEg1mCl4gKtVcQI9Q6bmXNFFv_-Kkg2IkvVWoVmyHZ6Baf4qsaArjgEALw_wcB:G:s&s_kwcid=AL!4422!3!785447140458!e!!g!!aws%20s3!23291342325!188768692203&gad_campaignid=23291342325&gbraid=0AAAAADjHtp9OQEhw4KpWMi_6riU35zYIx&gclid=Cj0KCQiAyP3KBhD9ARIsAAJLnnaNTmdEg1mCl4gKtVcQI9Q6bmXNFFv_-Kkg2IkvVWoVmyHZ6Baf4qsaArjgEALw_wcB): Amazon Simple Storage Service (Amazon S3) is an object storage service offering industry-leading scalability, data availability, security, and performance.
  - [AWS Lambda](https://aws.amazon.com/pm/lambda/?trk=065f9330-e033-4770-bfd7-4af000a338f2&sc_channel=ps&trk=065f9330-e033-4770-bfd7-4af000a338f2&sc_channel=ps&ef_id=Cj0KCQiAyP3KBhD9ARIsAAJLnnZOr4GvMhMQPAEUX4j8GHVEmV61hCVf0K1LJ4TPTAduJyIQsVapSeQaAicOEALw_wcB:G:s&s_kwcid=AL!4422!3!785483253781!e!!g!!aws%20lambda!23300619076!189486859415&gad_campaignid=23300619076&gbraid=0AAAAADjHtp8Z-4m5FmKk1gcss6H3jahHT&gclid=Cj0KCQiAyP3KBhD9ARIsAAJLnnZOr4GvMhMQPAEUX4j8GHVEmV61hCVf0K1LJ4TPTAduJyIQsVapSeQaAicOEALw_wcB): AWS Lambda is a compute service that runs your code in response to events and automatically manages the compute resources.
@@ -30,7 +30,7 @@ The following are the components used in this project:
  - [AWS IAM](https://aws.amazon.com/iam/?trk=505f0d86-e891-4dca-81fd-6f5a2bc819a4&sc_channel=ps&trk=505f0d86-e891-4dca-81fd-6f5a2bc819a4&sc_channel=ps&ef_id=Cj0KCQiAyP3KBhD9ARIsAAJLnnZG-xhrkR2ekbTziO_KxyTSPVniiI6rFmdfbcOzXW4LF5m9Fh9E4gMaAl9jEALw_wcB:G:s&s_kwcid=AL!4422!3!785574083510!e!!g!!amazon%20iam!23291341866!194328866772&gad_campaignid=23291341866&gbraid=0AAAAADjHtp-cNR21eLrUqQST6uvyJOPaC&gclid=Cj0KCQiAyP3KBhD9ARIsAAJLnnZG-xhrkR2ekbTziO_KxyTSPVniiI6rFmdfbcOzXW4LF5m9Fh9E4gMaAl9jEALw_wcB): AWS Identity and Access Management (IAM) is a globally scoped AWS service that enables organizations to securely define, manage, and enforce fine-grained permissions for identities and resources, ensuring that the right principals have the appropriate level of access to AWS services and assets.
  - [Amazon SNS](https://aws.amazon.com/sns/): Amazon Simple Notification Service (SNS) is a fully managed, highly scalable publish–subscribe messaging service that enables the decoupled, asynchronous delivery of messages and event notifications to multiple subscribers across distributed systems and applications.
 
-## Workflow
+## Workflow 📊
 Below is the chain of events that occur in this architecture:
   1. User uploads image to **Source S3 Bucket**
   2. **AWS Lambda Function** gets triggered
@@ -48,35 +48,73 @@ The following are pre-requistes that are necessary to successfully use this pack
   - [**AWS CLI**](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
   - [**Terraform**](https://developer.hashicorp.com/terraform/install)
   - [**Terraform CLI**](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
+  - [**TFLint**](https://github.com/terraform-linters/tflint)
+  - [**Python**](https://www.python.org/)
 
 # Usage 🛠️
-## Email
+## Email ✉️
 This project requires the user to specify an email address using [terraform.tfvars](https://developer.hashicorp.com/terraform/language/values/variables) file. Please follow the steps below:
   1. Create a file named **terraform.tfvars** file in the root directory
   2. Add `email_endpoint="YOUR_EMAIL_ADDRESS"` and save the file
 
-## Makefile
-This project utlisies a **Makefile** for convinience and ease of development. The following are the commands that are pertinent to this project:
+## Python local development 🐍
+The source code for this system has been developed using Python. The following Python dependencies are currently being used:
+
+- [**boto3**](https://pypi.org/project/boto3/)
+- [**pytest**](https://pypi.org/project/pytest/)
+- [**pytest-cov**](https://pypi.org/project/pytest-cov/)
+- [**flake8**](https://pypi.org/project/flake8/)
+
+## Makefile 🏠
+This project utilises a **Makefile** for convenience and ease of development. The following commands are available from the repository root:
+
+`make help`
+
+Displays the available Make targets and what each one does.
 
 `make init`
 
-Initializes the project
+Initialises the Terraform working directory in the `iac/` folder.
 
-`make run`
+`make update`
 
-Updates lambda source code
+Zips the Lambda source code and copies the archive into the infrastructure folder for deployment.
+
+`make fmt`
+
+Formats the Terraform configuration files recursively.
+
+`make lint`
+
+Formats Terraform files, initialises TFLint, and runs the Terraform lint checks.
 
 `make plan`
 
-Displays planned changes
+Shows the planned Terraform changes for the current configuration.
 
 `make deploy`
 
-Deploys desired infrastructure
+Applies the Terraform configuration to deploy the infrastructure.
 
 `make destroy`
 
-Removes deployed infrastructure
+Removes the deployed infrastructure.
+
+`make src-init`
+
+Sets up the Python virtual environment and installs the required Python dependencies.
+
+`make src-lint`
+
+Runs flake8 against the Python source and tests.
+
+`make src-test`
+
+Runs the Python unit test suite.
+
+`make src-build`
+
+Runs the full Python build workflow by executing `src-init`, `src-lint`, and `src-test`.
 
 # Forking & Contribution 🍴
 This project is a great base for further development. Some ideas for extending/building upon this project:
