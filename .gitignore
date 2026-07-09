@@ -45,4 +45,7 @@ src/.venv/
 src/__pycache__/
 src/.pytest_cache/
 src/.ruff_cache/
+**/__pycache__/
+**/*.py[cod]
 src/*.pyc
+src/tests/__pycache__/
