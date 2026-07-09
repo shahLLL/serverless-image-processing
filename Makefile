@@ -28,7 +28,7 @@ deploy: ./iac/locals.tf ./iac/main.tf ./iac/outputs.tf ./iac/terraform.tf ./iac/
 destroy: ./iac/locals.tf ./iac/main.tf ./iac/outputs.tf ./iac/terraform.tf ./iac/variables.tf
 	cd ./iac && terraform destroy
 src-init: ./src/setup_venv.sh ./src/requirements.txt
-	cd ./src && ./setup_venv.sh
+	cd ./src && chmod +x setup_venv.sh && ./setup_venv.sh
 src-lint: ./src/.flake8 ./src/lambda_function.py ./src/tests/test_lambda_function.py ./src/.venv
 	cd ./src && . .venv/bin/activate && flake8 . && echo "✅ Python Source Code Linting Successful"
 src-test: ./src/.venv ./src/lambda_function.py ./src/tests/test_lambda_function.py
