@@ -33,5 +33,5 @@ src-lint: ./src/.flake8 ./src/lambda_function.py ./src/tests/test_lambda_functio
 	cd ./src && . .venv/bin/activate && if flake8 .; then echo "✅ Python Source Code Linting Successful"; fi
 src-test: ./src/.venv ./src/lambda_function.py ./src/tests/test_lambda_function.py
 	cd ./src && . .venv/bin/activate && pytest -q
-src-build: src-init src-lint src-test
+src-build: ./src/setup_venv.sh ./src/requirements.txt ./src/.flake8 ./src/lambda_function.py ./src/tests/test_lambda_function.py 
 	@$(MAKE) src-init && $(MAKE) src-lint && $(MAKE) src-test && echo "✅ Source Code Build Successful"
