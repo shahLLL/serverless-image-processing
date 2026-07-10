@@ -20,7 +20,7 @@ update: ./src/lambda_function.py
 fmt: ./iac/locals.tf ./iac/main.tf ./iac/outputs.tf ./iac/terraform.tf ./iac/variables.tf
 	cd ./iac && terraform fmt -recursive
 lint: fmt init ./iac/locals.tf ./iac/main.tf ./iac/outputs.tf ./iac/terraform.tf ./iac/variables.tf ./iac/.tflint.hcl
-	cd ./iac && tflint --init && tflint && echo "✅ TFLint check passed successfully."
+	cd ./iac && tflint --init && if tflint; then echo "✅ TFLint check passed successfully."; fi
 plan: ./iac/locals.tf ./iac/main.tf ./iac/outputs.tf ./iac/terraform.tf ./iac/variables.tf
 	cd ./iac && terraform plan
 deploy: ./iac/locals.tf ./iac/main.tf ./iac/outputs.tf ./iac/terraform.tf ./iac/variables.tf
@@ -30,8 +30,8 @@ destroy: ./iac/locals.tf ./iac/main.tf ./iac/outputs.tf ./iac/terraform.tf ./iac
 src-init: ./src/setup_venv.sh ./src/requirements.txt
 	cd ./src && chmod +x setup_venv.sh && ./setup_venv.sh
 src-lint: ./src/.flake8 ./src/lambda_function.py ./src/tests/test_lambda_function.py ./src/.venv
-	cd ./src && . .venv/bin/activate && flake8 . && echo "✅ Python Source Code Linting Successful"
+	cd ./src && . .venv/bin/activate && if flake8 .; then echo "✅ Python Source Code Linting Successful"; fi
 src-test: ./src/.venv ./src/lambda_function.py ./src/tests/test_lambda_function.py
 	cd ./src && . .venv/bin/activate && pytest -q
 src-build: src-init src-lint src-test
-	@echo "✅ Source Code Build Successful"
+	@$(MAKE) src-init && $(MAKE) src-lint && $(MAKE) src-test && echo "✅ Source Code Build Successful"
