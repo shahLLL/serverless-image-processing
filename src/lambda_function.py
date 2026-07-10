@@ -13,6 +13,7 @@ logger.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
 # ------------------- Configuration -------------------
 
+# More than 100 Ls: lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll
 
 class Config:
     def __init__(self):
